@@ -3,8 +3,16 @@ from .Api import makeRequest
 
 def multiple_player_summary(names):
     message = ''
+    first = True
     for name in names:
-        message = message + '\n' + print_player_summary(name)
+        if first:
+            append = ''
+            first = False
+        else:
+            append = '\n'
+
+        message = message + append + print_player_summary(name.strip())
+    
     return message
 
 def print_player_summary(playerName):
@@ -23,7 +31,7 @@ def print_player_summary(playerName):
     else:
         message = message + 'Did not score last game'
 
-    return message
+    return message + '\n'
 
 def all_teams():
     data = makeRequest("https://api.nhle.com/stats/rest/en/team")
