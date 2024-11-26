@@ -1,11 +1,29 @@
-import sys
-import numpy
-import pandas
-import urllib.request
-import json
-import pprint
 import PySimpleGUI as sg
+from .Api import makeRequest
 
+def multiple_player_summary(names):
+    message = ''
+    for name in names:
+        message = message + '\n' + print_player_summary(name)
+    return message
+
+def print_player_summary(playerName):
+    player = search_player(playerName)
+    if player == None:
+        return None
+
+    scored_last_game = player_scored_last_game(player['playerId'])
+
+    message = f"{player['skaterFullName']} @ {player['teamAbbrevs']}\n"
+    goalsPerGame = player['goals'] / player['gamesPlayed']
+    message = message + f"{goalsPerGame:.3f} Goals per game this season\n"
+    
+    if scored_last_game:
+        message = message + 'Scored last game'
+    else:
+        message = message + 'Did not score last game'
+
+    return message
 
 def all_teams():
     data = makeRequest("https://api.nhle.com/stats/rest/en/team")
@@ -24,19 +42,5 @@ def search_player(name):
     playerObj = None
     for player in playerData['data']:
         if(name == player['teamAbbrevs'] or name in player['skaterFullName']):
-            print(player['goals'] / player['gamesPlayed'])
-            print(player['playerId'])
-            print(player['skaterFullName'])
             playerObj = player
     return playerObj
-
-
-def makeRequest(url):
-    req = urllib.request.Request(url)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0')
-    req.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8')
-    req.add_header('Accept-Language', 'en-US,en;q=0.5')
-    f = urllib.request.urlopen(req)
-    data = f.read()
-    jsonData = json.loads(data)
-    return jsonData
