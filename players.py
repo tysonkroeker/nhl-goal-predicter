@@ -1,21 +1,16 @@
-import sys
-import numpy
-import pandas
-import urllib.request
-import json
-import pprint
 import PySimpleGUI as sg
-import api
+from services.PlayerService import print_player_summary
 
 layout = [
-    [sg.Text("Hello TEST")],
-    [sg.InputText()],
+    [sg.Text("Enter player name to find out how likely they are to score!")],
+    [sg.Text('', key='PlayerStats')],
+    [sg.InputText("", key="PlayerInput")],
     [sg.Button("Search")]
     ]
 
 # Create the window
-window = sg.Window("Demo", layout)
-
+window = sg.Window("NHL Goal Predicter", layout, finalize=True)
+window['PlayerInput'].bind("<Return>", "_Enter")
 
 
 # Create an event loop
@@ -24,7 +19,10 @@ while True:
     if event == sg.WIN_CLOSED:
         break
     if event == "Search":
-        player = api.search_player(values[0])
-        api.player_scored_last_game(player['playerId'])
+        message = print_player_summary(values['PlayerInput'])
+        window['PlayerStats'].update(message)
+    if event == "PlayerInput" + "_Enter":
+        message = print_player_summary(values['PlayerInput'])
+        window['PlayerStats'].update(message)
 
 window.close()
