@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-from services.PlayerService import print_player_summary
+from services.PlayerService import multiple_player_summary
 
 layout = [
     [sg.Text("Enter player name to find out how likely they are to score!")],
@@ -18,11 +18,9 @@ while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED:
         break
-    if event == "Search":
-        message = print_player_summary(values['PlayerInput'])
-        window['PlayerStats'].update(message)
-    if event == "PlayerInput" + "_Enter":
-        message = print_player_summary(values['PlayerInput'])
+    if event == "Search" or event == "PlayerInput" + "_Enter":
+        names = values['PlayerInput'].split(',')
+        message = multiple_player_summary(names)
         window['PlayerStats'].update(message)
 
 window.close()
